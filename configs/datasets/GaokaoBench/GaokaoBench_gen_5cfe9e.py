@@ -1,5 +1,5 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
-from opencompass.openicl.icl_retriever import ZeroRetriever
+from opencompass.openicl.icl_retriever import ZeroRetriever, FixKRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import GaokaoBenchDataset
 
@@ -262,6 +262,16 @@ for _folder, _prompts in [
             "ice_template": {
                 "type": PromptTemplate,
                 "template": {
+                    "round": [
+                        {"role": "HUMAN", "prompt": _p['prefix_prompt'] + '{question}'},
+                        {"role": "BOT", "prompt": "{answer}\n"},
+                    ]
+                },
+                "ice_token": "</E>"
+            },
+            "prompt_template": {
+                "type": PromptTemplate,
+                "template": {
                     "round": [{
                         "role": "HUMAN",
                         "prompt": _p['prefix_prompt'] + '{question}'
@@ -270,11 +280,12 @@ for _folder, _prompts in [
                 "ice_token": "</E>"
             },
             "retriever": {
-                "type": ZeroRetriever
+                "type": FixKRetriever
             },
             "inferencer": {
                 "type": GenInferencer,
                 "max_out_len": 1024,
+                "fix_id_list": [0, 1, 2, 3, 4],
             }
         }
         _eval_cfg = {

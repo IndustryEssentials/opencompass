@@ -1,5 +1,5 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
-from opencompass.openicl.icl_retriever import ZeroRetriever
+from opencompass.openicl.icl_retriever import ZeroRetriever, FixKRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import SQuAD20Dataset, SQuAD20Evaluator
 
@@ -8,15 +8,27 @@ squad20_reader_cfg = dict(
     output_column='answers')
 
 squad20_infer_cfg = dict(
+    ice_template=dict(
+        type=PromptTemplate,
+        template=dict(
+            begin="</E>",
+            round=[
+                dict(role='HUMAN', prompt='{context}\nAccording to the above passage, answer the following question. If it is impossible to answer according to the passage, answer `impossible to answer`:\nQuestion: {question}'),
+                dict(role='BOT', prompt='Answer:'),
+            ]),
+        ice_token="</E>",
+    ),
     prompt_template=dict(
         type=PromptTemplate,
+        ice_token="</E>",
         template=dict(
             round=[
                 dict(role='HUMAN', prompt='{context}\nAccording to the above passage, answer the following question. If it is impossible to answer according to the passage, answer `impossible to answer`:\nQuestion: {question}'),
                 dict(role='BOT', prompt='Answer:'),
-            ], )),
-    retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=50))
+            ])),
+
+    retriever=dict(type=FixKRetriever),
+    inferencer=dict(type=GenInferencer, fix_id_list=[0, 1, 2, 3, 4], max_out_len=50))
 
 squad20_eval_cfg = dict(
     evaluator=dict(type=SQuAD20Evaluator), pred_role='BOT')

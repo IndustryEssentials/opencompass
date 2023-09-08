@@ -1,5 +1,5 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
-from opencompass.openicl.icl_retriever import ZeroRetriever
+from opencompass.openicl.icl_retriever import ZeroRetriever, FixKRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import CHIDDataset_V2
@@ -11,7 +11,7 @@ chid_reader_cfg = dict(
 )
 
 chid_infer_cfg = dict(
-    prompt_template=dict(
+    ice_template=dict(
         type=PromptTemplate,
         template=dict(
             round=[
@@ -20,9 +20,23 @@ chid_infer_cfg = dict(
                     prompt=
                     "{content}\n请选择______处所填的词\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nE. {E}\nF. {F}\nG. {G}\n请从”A“，”B“，”C“，”D“，”E“，”F“，”G“中进行选择。答：",
                 ),
+                dict(role="BOT", prompt="{answer}\n"),
+            ]
+        ),
+    ),
+    prompt_template=dict(
+        type=PromptTemplate,
+        ice_token="</E>",
+        template=dict(
+            round=[
+                dict(
+                    role="HUMAN",
+                    prompt=
+                    "{content}\n请选择______处所填的词\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nE. {E}\nF. {F}\nG. {G}\n请从”A“，”B“，”C“，”D“，”E“，”F“，”G“中进行选择。答：",
+                ),
             ])),
-    retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer),
+    retriever=dict(type=FixKRetriever),
+    inferencer=dict(type=GenInferencer, fix_id_list=[0, 1, 2, 3, 4]),
 )
 
 chid_eval_cfg = dict(

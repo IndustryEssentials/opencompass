@@ -1,5 +1,5 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
-from opencompass.openicl.icl_retriever import ZeroRetriever
+from opencompass.openicl.icl_retriever import ZeroRetriever, FixKRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import hellaswagDataset_V2
@@ -11,8 +11,25 @@ hellaswag_reader_cfg = dict(
     test_split="validation")
 
 hellaswag_infer_cfg = dict(
+    ice_template=dict(
+        type=PromptTemplate,
+        template=dict(
+            begin="</E>",
+            round=[
+                dict(
+                    role="HUMAN",
+                    prompt=("{ctx}\nQuestion: Which ending makes the most sense?\n"
+                            "A. {A}\nB. {B}\nC. {C}\nD. {D}\n"
+                            "You may choose from 'A', 'B', 'C', 'D'.\n"
+                            "Answer:"),
+                ),
+                dict(role="BOT", prompt="{label}"),
+            ]),
+        ice_token="</E>",
+    ),
     prompt_template=dict(
         type=PromptTemplate,
+        ice_token="</E>",
         template=dict(round=[
             dict(
                 role="HUMAN",
@@ -23,8 +40,8 @@ hellaswag_infer_cfg = dict(
             ),
         ]),
     ),
-    retriever=dict(type=ZeroRetriever, ),
-    inferencer=dict(type=GenInferencer),
+    retriever=dict(type=FixKRetriever),
+    inferencer=dict(type=GenInferencer, fix_id_list=[0, 1, 2, 3, 4])
 )
 
 hellaswag_eval_cfg = dict(

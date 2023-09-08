@@ -44,8 +44,8 @@ bbh_free_form_sets = [
 bbh_datasets = []
 for _name in bbh_multiple_choice_sets:
     _hint = None
-    if exists(f"{_path_prefix}/lib_prompt/{_name}.txt"):
-        _hint = open(f"{_path_prefix}/lib_prompt/{_name}.txt", 'r').read()
+#   if exists(f"{_path_prefix}/lib_prompt/{_name}.txt"):
+    _hint = open(f"{_path_prefix}/lib_prompt/{_name}.txt", 'r').read()
     bbh_infer_cfg = dict(
         prompt_template=dict(
             type=PromptTemplate,
@@ -76,8 +76,8 @@ for _name in bbh_multiple_choice_sets:
 
 for _name in bbh_free_form_sets:
     _hint = None
-    if exists(f"{_path_prefix}/lib_prompt/{_name}.txt"):
-        _hint = open(f"{_path_prefix}/lib_prompt/{_name}.txt", 'r').read()
+#   if exists(f"{_path_prefix}/lib_prompt/{_name}.txt"):
+    _hint = open(f"{_path_prefix}/lib_prompt/{_name}.txt", 'r').read()
     bbh_infer_cfg = dict(
         prompt_template=dict(
             type=PromptTemplate,
