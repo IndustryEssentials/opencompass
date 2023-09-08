@@ -16,7 +16,7 @@ Xsum_infer_cfg = dict(
                     role="HUMAN",
                     prompt= "Document：{dialogue}\nBased on the previous text, provide a brief single summary:"
                 ),
-                dict(role="BOT", prompt="{label}"),
+                dict(role="BOT", prompt="{summary}"),
             ]),
         ice_token="</E>",
     ),
