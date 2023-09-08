@@ -1,5 +1,5 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
-from opencompass.openicl.icl_retriever import ZeroRetriever
+from opencompass.openicl.icl_retriever import ZeroRetriever, FixKRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import cmnliDataset_V2
@@ -12,8 +12,23 @@ ocnli_reader_cfg = dict(
 
 # TODO: two prompt templates for ocnli
 ocnli_infer_cfg = dict(
+    ice_template=dict(
+        type=PromptTemplate,
+        template=dict(
+            begin="</E>",
+            round=[
+                dict(
+                    role="HUMAN",
+                    prompt=
+                    "语句一：“{sentence1}”\n语句二：“{sentence2}”\n请问这两句话是什么关系？\nA. 蕴含\n B. 矛盾\n C. 无关\n请从“A”，“B”，“C”中进行选择。\n答："
+                ),
+                dict(role="BOT", prompt="{label}"),
+            ]),
+        ice_token="</E>",
+    ),
     prompt_template=dict(
         type=PromptTemplate,
+        ice_token="</E>",
         template=dict(round=[
             dict(
                 role="HUMAN",
@@ -22,8 +37,8 @@ ocnli_infer_cfg = dict(
             ),
         ]),
     ),
-    retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer),
+    retriever=dict(type=FixKRetriever),
+    inferencer=dict(type=GenInferencer, fix_id_list=[0, 1, 2, 3, 4]),
 )
 
 ocnli_eval_cfg = dict(

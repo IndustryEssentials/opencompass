@@ -1,5 +1,5 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
-from opencompass.openicl.icl_retriever import ZeroRetriever
+from opencompass.openicl.icl_retriever import ZeroRetriever, FixKRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import BoolQDataset_V2
@@ -11,16 +11,25 @@ BoolQ_reader_cfg = dict(
 )
 
 BoolQ_infer_cfg = dict(
+    ice_template=dict(
+        type=PromptTemplate,
+        template=dict(
+            begin="</E>",
+            round=[
+                dict(role="HUMAN", prompt="{passage}\nQuestion: {question}\nA. Yes\nB. No\nAnswer:"),
+                dict(role="BOT", prompt="{label}"),
+            ]),
+        ice_token="</E>",
+    ),
     prompt_template=dict(
         type=PromptTemplate,
         template=dict(round=[
-            dict(
-                role="HUMAN",
-                prompt="{passage}\nQuestion: {question}\nA. Yes\nB. No\nAnswer:"),
+            dict(role="HUMAN", prompt="{passage}\nQuestion: {question}\nA. Yes\nB. No\nAnswer:"),
         ]),
+        ice_token="</E>",
     ),
-    retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer),
+    retriever=dict(type=FixKRetriever),
+    inferencer=dict(type=GenInferencer, fix_id_list=[0, 1, 2, 3, 4]),
 )
 
 BoolQ_eval_cfg = dict(

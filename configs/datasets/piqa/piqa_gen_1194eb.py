@@ -1,5 +1,5 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
-from opencompass.openicl.icl_retriever import ZeroRetriever
+from opencompass.openicl.icl_retriever import ZeroRetriever, FixKRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import piqaDataset_V2
@@ -11,8 +11,22 @@ piqa_reader_cfg = dict(
     test_split="validation")
 
 piqa_infer_cfg = dict(
+    ice_template=dict(
+        type=PromptTemplate,
+        template=dict(
+            begin="</E>",
+            round=[
+                dict(
+                    role="HUMAN",
+                    prompt="{goal}\nA. {sol1}\nB. {sol2}\nAnswer:"
+                ),
+                dict(role="BOT", prompt="{answer}"),
+            ]),
+        ice_token="</E>",
+    ),
     prompt_template=dict(
         type=PromptTemplate,
+        ice_token="</E>",
         template=dict(
             round=[
                 dict(
@@ -20,8 +34,8 @@ piqa_infer_cfg = dict(
                     prompt="{goal}\nA. {sol1}\nB. {sol2}\nAnswer:")
             ], ),
     ),
-    retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer),
+    retriever=dict(type=FixKRetriever),
+    inferencer=dict(type=GenInferencer, fix_id_list=[0, 1, 2, 3, 4])
 )
 
 piqa_eval_cfg = dict(
