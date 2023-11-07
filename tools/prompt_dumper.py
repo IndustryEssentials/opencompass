@@ -66,19 +66,19 @@ def dump_prompt_list(prompt_list) -> List[str]:
     return prompts
 
 
-def pair_elements(lst):
+def pair_elements(lst, join=True):
     """
     Make pairs out of input list, for example:
     input: ["Qustion", "Answer", "Question2", "Answer2"]
     output: ["Qustion Answer", "Question2 Answer2"]
     """
     it = iter(lst)
-    return [f"{q}{a}" for q, a in itertools.zip_longest(it, it)]
+    return [f"{q}{a}" if join else [q, a] for q, a in itertools.zip_longest(it, it)]
 
 
-def dump_ice_list(prompt_list) -> List[str]:
+def dump_ice_list(prompt_list, join=True) -> List[str]:
     prompts = [p for p in (extract_prompt_item(item) for item in prompt_list) if p is not None]
-    return pair_elements(prompts)
+    return pair_elements(prompts, join)
 
 
 def write_prompts(dataset_cfg, dataset_abbr, output_file, count=1, file_mode="w"):
@@ -136,6 +136,7 @@ def write_prompts(dataset_cfg, dataset_abbr, output_file, count=1, file_mode="w"
                     "inputs": {
                         "_prefix": "",
                         "_few_shots": dump_ice_list(ice),
+                        "_ice": dump_ice_list(ice, join=False),
                         "_input_text": "\n".join(dump_prompt_list(prompts_with_label[0])), # just a placeholder
                         "_input_texts": [list(dump_prompt_list(prompt)) for prompt in prompts_with_label],
                         "_few_shots_prompt_format": "{_input_texts}",
@@ -167,6 +168,7 @@ def write_prompts(dataset_cfg, dataset_abbr, output_file, count=1, file_mode="w"
                     "inputs": {
                         "_prefix": "",
                         "_few_shots": dump_ice_list(ice),
+                        "_ice": dump_ice_list(ice, join=False),
                         "_input_text": "\n".join(dump_prompt_list(prompt)),
                         "_few_shots_prompt_format": _few_shots_prompt_format,
                         **data,
